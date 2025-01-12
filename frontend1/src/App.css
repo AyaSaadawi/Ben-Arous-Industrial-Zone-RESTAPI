@@ -1,0 +1,288 @@
+/* Global Styles */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-image: url('./photo.jpg');
+  background-size: cover; 
+  background-position: center;
+  color: #333;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  body {
+    flex-direction: column;
+  }
+}
+
+/* Container for the login page */
+.login-container {
+  text-align: center;
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-container h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.google-btn {
+  display: flex;
+  margin-left: 40px;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  color: #333;
+  border: 1px solid #dcdcdc;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  width: auto;
+  text-align: center;
+  transition: background-color 0.3s, box-shadow 0.3s;
+  font-family: 'Arial', sans-serif;
+}
+
+.google-btn img {
+  margin-right: 10px;
+  width: 20px;
+  height: 20px;
+}
+
+.google-btn:hover {
+  background-color: #f7f7f7;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Header Styles */
+header {
+  background-color: #2b97da; 
+  color: white;            
+  padding: 10px 20px;     
+  width: 100%;             
+  position: fixed;         
+  top: 0;                 
+  left: 0;                 
+  right: 0;
+  z-index: 1000;           
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+  display: flex;           
+  justify-content: flex-start; 
+  align-items: center;     
+}
+
+header .logo {
+  width: 40px;             
+  height: 40px;            
+  margin-right: 15px;
+}
+
+header .title {
+  font-size: 18px;         
+  font-weight: bold;      
+  margin-right: 20px;      
+  margin-top:20px;
+  color: white;            
+}
+
+header .logout-button {
+  padding: 5px 10px;       
+  background-color: #f4f4f4; 
+  color: #333;             
+  border: none;            
+  border-radius: 5px;     
+  cursor: pointer;        
+  transition: background-color 0.3s ease; 
+  font-size: 14px;         
+}
+
+header .logout-button:hover {
+  background-color: #ddd; 
+}
+
+header .logout-button:focus {
+  outline: none;           
+}
+
+
+
+/* Dashboard Styles */
+.dashboard-container {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background-color: #f4f4f4;
+  width: 100%;
+  max-width: 1200px;
+  margin-top: 500px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 36px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+h2 {
+  font-size: 28px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: #444;
+}
+
+section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+section iframe {
+  width: 100%;
+  border-radius: 8px;
+}
+
+pre {
+  background-color: #f8f8f8;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 16px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-x: auto;
+}
+
+p {
+  font-size: 16px;
+  color: #555;
+}
+
+a {
+  color: #1a73e8;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Loading state */
+.loading {
+  text-align: center;
+  font-size: 18px;
+  color: #888;
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 1024px) {
+  .dashboard-container {
+    padding: 15px;
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  h2 {
+    font-size: 24px;
+  }
+
+  section {
+    padding: 15px;
+  }
+
+  pre {
+    font-size: 14px;
+  }
+
+  iframe {
+    width: 100%;
+    height: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+
+  .login-container {
+    width: 100%;
+    padding: 20px;
+  }
+
+  header {
+    padding: 10px 15px;     
+  }
+
+  header .logo {
+    width: 35px;            
+    height: 35px;           
+    margin-right: 10px;     
+  }
+
+  header .title {
+    font-size: 16px;         
+    margin-right: 15px;      
+  }
+
+  header .logout-button {
+    font-size: 12px;         
+    padding: 4px 8px;        
+  }
+
+  .dashboard-container {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  section {
+    margin-bottom: 20px;
+  }
+
+  pre {
+    font-size: 14px;
+  }
+
+  iframe {
+    width: 100%;
+    height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 22px;
+  }
+
+  h2 {
+    font-size: 18px;
+  }
+
+  pre {
+    font-size: 12px;
+  }
+
+  iframe {
+    height: 200px;
+  }
+}

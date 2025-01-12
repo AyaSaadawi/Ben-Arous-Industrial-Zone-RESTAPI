@@ -1,0 +1,1570 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Authentication API",
+    "description": "API for user authentication",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": ["General"],
+        "summary": "Authenticate user and get a JWT token",
+        "description": "Login with your Google email to receive a JWT token",
+        "operationId": "login",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "User email for authentication",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LoginRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully logged in, returns JWT token.",
+            "schema": {
+              "$ref": "#/definitions/LoginResponse"
+            }
+          },
+          "400": {
+            "description": "Invalid email"
+          }
+        }
+      }
+    },
+    "/refresh": {
+      "post": {
+        "tags": ["General"],
+        "summary": "Refresh JWT token",
+        "description": "Provide a valid refresh token to receive a new access token",
+        "operationId": "refreshToken",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Refresh token request",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RefreshTokenRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully refreshed token, returns new JWT token.",
+            "schema": {
+              "$ref": "#/definitions/RefreshTokenResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized if no refresh token is provided"
+          },
+          "403": {
+            "description": "Forbidden if refresh token is invalid"
+          }
+        }
+      }
+    },   
+    "/auth/google": {
+      "get": {
+        "tags": ["General"],
+        "summary": "Redirect to Google OAuth2 login",
+        "description": "Redirects the user to Google's OAuth2 login page to initiate authentication.",
+        "operationId": "googleLogin",
+        "responses": {
+          "302": {
+            "description": "Redirects to Google OAuth2 login page."
+          },
+          "500": {
+            "description": "Internal server error."
+          }
+        }
+      }
+    },
+    "/auth/google/callback": {
+      "get": {
+        "tags": ["General"],
+        "summary": "Handle OAuth2 callback from Google",
+        "description": "Handles the OAuth2 callback from Google and authenticates the user.",
+        "operationId": "googleCallback",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "description": "Authorization code received from Google OAuth2.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirects to the frontend dashboard after successful authentication."
+          },
+          "400": {
+            "description": "Authorization code not provided."
+          },
+          "500": {
+            "description": "Authentication failed."
+          }
+        }
+      }
+    },
+    "/logout": {
+      "get": {
+        "tags": ["General"],
+        "summary": "Log out the user and clear session",
+        "description": "Logs out the user by destroying the session and clearing the JWT cookie.",
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "description": "Successfully logged out."
+          },
+          "400": {
+            "description": "Failed to log out."
+          }
+        }
+      }
+    },
+    "/companies": {
+      "get": {
+        "tags": ["Companies"],
+        "summary": "Get all companies",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of all companies",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Company"
+              }
+            }
+          },
+          "500": {
+            "description": "Error fetching companies"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Companies"],
+        "summary": "Create a new company",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "company",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NewCompany"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company created successfully",
+            "schema": {
+              "$ref": "#/definitions/Company"
+            }
+          },
+          "400": {
+            "description": "Missing required fields (name, address)"
+          },
+          "500": {
+            "description": "Error creating company"
+          }
+        }
+      },
+      "options": {
+        "tags": ["Companies"],
+        "summary": "Get allowed methods for companies",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of allowed methods for the companies route"
+          }
+        }
+      }
+    },
+    "/companies/{id}": {
+      "get": {
+        "tags": ["Companies"],
+        "summary": "Get a single company by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID of the company to fetch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company details",
+            "schema": {
+              "$ref": "#/definitions/Company"
+            }
+          },
+          "404": {
+            "description": "Company not found"
+          },
+          "500": {
+            "description": "Error fetching company"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Companies"],
+        "summary": "Update a company by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID of the company to update"
+          },
+          {
+            "name": "company",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateCompany"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company updated successfully"
+          },
+          "400": {
+            "description": "Missing required fields (name, address)"
+          },
+          "500": {
+            "description": "Error updating company"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Companies"],
+        "summary": "Delete a company by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID of the company to delete"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company deleted successfully"
+          },
+          "500": {
+            "description": "Error deleting company"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Companies"],
+        "summary": "Partially update a company by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID of the company to update"
+          },
+          {
+            "name": "updates",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateCompany"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Company partially updated successfully"
+          },
+          "400": {
+            "description": "No fields provided to update"
+          },
+          "500": {
+            "description": "Error partially updating company"
+          }
+        }
+      },
+      "options": {
+        "tags": ["Companies"],
+        "summary": "Get allowed methods for a specific company",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of allowed methods for the specific company route"
+          }
+        }
+      }  
+    },
+    "/jobs": {
+      "get": {
+        "tags": ["Jobs"],
+        "summary": "Get all jobs",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of all jobs",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Job"
+              }
+            }
+          },
+          "500": {
+            "description": "Error fetching jobs"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Jobs"],
+        "summary": "Create a new job",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "job",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NewJob"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job created successfully",
+            "schema": {
+              "$ref": "#/definitions/Job"
+            }
+          },
+          "400": {
+            "description": "Missing required fields (title, description)"
+          },
+          "500": {
+            "description": "Error creating job"
+          }
+        }
+      }
+    },
+    "/jobs/{id}": {
+      "get": {
+        "tags": ["Jobs"],
+        "summary": "Get a single job by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID of the job to fetch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job details",
+            "schema": {
+              "$ref": "#/definitions/Job"
+            }
+          },
+          "404": {
+            "description": "Job not found"
+          },
+          "500": {
+            "description": "Error fetching job"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Jobs"],
+        "summary": "Update a job by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID of the job to update"
+          },
+          {
+            "name": "job",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdateJob"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job updated successfully"
+          },
+          "400": {
+            "description": "Missing required fields (title, description)"
+          },
+          "500": {
+            "description": "Error updating job"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Jobs"],
+        "summary": "Delete a job by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "description": "ID of the job to delete"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job deleted successfully"
+          },
+          "500": {
+            "description": "Error deleting job"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Jobs"],
+        "summary": "Partially update a job",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Updates specific fields of a job based on the provided job ID and request body.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID of the job to update",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "updates",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/JobUpdateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job updated successfully"
+          },
+          "400": {
+            "description": "No fields provided for update"
+          },
+          "404": {
+            "description": "Job not found"
+          },
+          "500": {
+            "description": "Error updating the job"
+          }
+        }
+      },
+      "options": {
+        "tags": ["Jobs"],
+        "summary": "Provide allowed methods for the jobs endpoint",
+        "description": "Returns the allowed HTTP methods for the jobs resource.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Allowed methods for the jobs endpoint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "allowed_methods": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "example": {
+                    "allowed_methods": ["GET", "POST", "OPTIONS"]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "head": {
+        "tags": ["Jobs"],
+        "summary": "Check if a job exists",
+        "description": "Checks if a job exists by its ID.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID of the job to check",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job exists"
+          },
+          "404": {
+            "description": "Job not found"
+          },
+          "500": {
+            "description": "Error checking the job"
+          }
+        }
+      }
+    },
+    "/applications": {
+      "get": {
+        "tags": ["Applications"],
+        "summary": "Fetch all applications",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "List of all applications",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Application"
+              }
+            }
+          },
+          "500": {
+            "description": "Error fetching applications"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Applications"],
+        "summary": "Create a new application",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{
+          "in": "body",
+          "name": "application",
+          "description": "New application data",
+          "schema": {
+            "$ref": "#/definitions/ApplicationCreateRequest"
+          }
+        }],
+        "responses": {
+          "201": {
+            "description": "Application created successfully",
+            "schema": {
+              "$ref": "#/definitions/Application"
+            }
+          },
+          "500": {
+            "description": "Error creating application"
+          }
+        }
+      },
+      "options": {
+        "tags": ["Applications"],
+        "summary": "Fetch allowed methods for applications",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Allowed HTTP methods",
+            "schema": {
+              "$ref": "#/definitions/AllowedMethodsResponse"
+            }
+          }
+        }
+      }
+    },
+    "/applications/user/{userId}": {
+      "get": {
+        "tags": ["Applications"],
+        "summary": "Fetch applications by user ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{
+          "name": "userId",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "description": "User ID"
+        }],
+        "responses": {
+          "200": {
+            "description": "List of applications for the user",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Application"
+              }
+            }
+          },
+          "500": {
+            "description": "Error fetching applications for user"
+          }
+        }
+      }
+    },
+    "/applications/job/{jobId}": {
+      "get": {
+        "tags": ["Applications"],
+        "summary": "Fetch applications by job ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{
+          "name": "jobId",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "description": "Job ID"
+        }],
+        "responses": {
+          "200": {
+            "description": "List of applications for the job",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Application"
+              }
+            }
+          },
+          "500": {
+            "description": "Error fetching applications for job"
+          }
+        }
+      }
+    },
+    "/applications/status/{status}": {
+      "get": {
+        "tags": ["Applications"],
+        "summary": "Fetch applications by status",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{
+          "name": "status",
+          "in": "path",
+          "required": true,
+          "type": "string",
+          "enum": ["pending", "accepted", "rejected"],
+          "description": "Application status"
+        }],
+        "responses": {
+          "200": {
+            "description": "List of applications with given status",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Application"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid status value"
+          },
+          "500": {
+            "description": "Error fetching applications by status"
+          }
+        }
+      }
+    },
+    "/applications/{id}": {
+      "put": {
+        "tags": ["Applications"],
+        "summary": "Update application status",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "description": "Application ID"
+        }, {
+          "in": "body",
+          "name": "status",
+          "description": "New status for the application",
+          "schema": {
+            "$ref": "#/definitions/ApplicationStatusUpdateRequest"
+          }
+        }],
+        "responses": {
+          "200": {
+            "description": "Application status updated successfully"
+          },
+          "400": {
+            "description": "Invalid status value"
+          },
+          "500": {
+            "description": "Error updating application status"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Applications"],
+        "summary": "Delete an application by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "description": "Application ID"
+        }],
+        "responses": {
+          "200": {
+            "description": "Application deleted successfully"
+          },
+          "500": {
+            "description": "Error deleting application"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Applications"],
+        "summary": "Partially update an application",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "description": "Application ID"
+        }, {
+          "in": "body",
+          "name": "application",
+          "description": "Application fields to update",
+          "schema": {
+            "$ref": "#/definitions/ApplicationUpdateRequest"
+          }
+        }],
+        "responses": {
+          "200": {
+            "description": "Application updated successfully"
+          },
+          "400": {
+            "description": "No fields provided for update"
+          },
+          "404": {
+            "description": "Application not found"
+          },
+          "500": {
+            "description": "Error updating application"
+          }
+        }
+      },
+      "head": {
+        "tags": ["Applications"],
+        "summary": "Check if an application exists",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "type": "integer",
+          "description": "Application ID"
+        }],
+        "responses": {
+          "200": {
+            "description": "Application exists"
+          },
+          "404": {
+            "description": "Application not found"
+          },
+          "500": {
+            "description": "Error checking application existence"
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Fetch all users",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "A list of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/User"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Users"],
+        "summary": "Create a new user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [{
+          "in": "body",
+          "name": "user",
+          "description": "New auser data",
+          "schema": {
+            "$ref": "#/definitions/UserCreateRequest"
+          }
+        }],
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid email format"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "options": {
+        "tags": ["Users"],
+        "summary": "List allowed methods",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Allowed methods",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "allowed_methods": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Fetch a user by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Users"],
+        "summary": "Update a user by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID of the user to update",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "body",
+            "required": true,
+            "name": "updates",
+            "description": "Update user data",
+            "schema": {
+              "$ref": "#/definitions/UserUpdateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User updated successfully"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "head": {
+        "tags": ["Users"],
+        "summary": "Check if a user exists",
+        "description": "Checks if a user exists by their ID.",
+        "operationId": "checkUserExists",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64",
+            "description": "ID of the user to check"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User exists"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": ["Users"],
+        "summary": "Delete a user by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted successfully"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Users"],
+        "summary": "Partially update a user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Updates specific fields of user data based on the provided user ID and request body.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID of the user to update",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "body",
+            "name": "user",
+            "description": "Partially update user data",
+            "schema": {
+              "$ref": "#/definitions/UserUpdateRequest"
+            }    
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User updated successfully"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/users/{id}/jobs": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get all jobs a user has applied for",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of jobs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/UserJob"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/users/{id}/apply": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Apply for a job as a user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID of the user to apply for the job",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "id",
+            "in": "body",
+            "description": "ID of the user applying for the job",
+            "schema": {
+              "$ref": "#/definitions/JobApplyRequest"
+            }
+          }
+        ],
+        "responses": {
+           "201": {
+            "description": "Application submitted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Application submitted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "500": {
+      "description": "Internal server error",
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "error": {
+                "type": "string",
+                "example": "Error applying for job"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "LoginRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "example": "user@gmail.com"
+        }
+      }
+    },
+    "LoginResponse": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzM2MTU5MjA2LCJleHAiOjE3MzYxNjI4MDZ9.Ovm18jYu4pUbkBe4pKKYue0rSIpr0SB7mczsCa9R4G0"
+        }
+      }
+    },
+    "RefreshTokenRequest": {
+      "type": "object",
+      "properties": {
+        "refreshToken": {
+          "type": "string",
+          "example": "dGhpc2lzYXJlZnJlc2h0b2tlbg=="
+        }
+      }
+    },
+    "RefreshTokenResponse": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string",
+          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzM2MTU5MjA2LCJleHAiOjE3MzYxNjI4MDZ9.Ovm18jYu4pUbkBe4pKKYue0rSIpr0SB7mczsCa9R4G0"
+        }
+      }
+    },
+    "Company": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "sector": {
+          "type": "string"
+        },
+        "contact_info": {
+          "type": "object"
+        },
+        "address": {
+          "type": "string"
+        },
+        "services": {
+          "type": "object"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "NewCompany": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "sector": {
+          "type": "string"
+        },
+        "contact_info": {
+          "type": "object"
+        },
+        "services": {
+          "type": "object"
+        }
+      },
+      "required": ["name", "address"]
+    },
+    "UpdateCompany": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "sector": {
+          "type": "string"
+        },
+        "contact_info": {
+          "type": "object"
+        },
+        "services": {
+          "type": "object"
+        }
+      }
+    },
+    "Job": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "example": 1
+        },
+        "title": {
+          "type": "string",
+          "example": "Software Engineer"
+        },
+        "description": {
+          "type": "string",
+          "example": "Develop and maintain software applications."
+        },
+        "company_id": {
+          "type": "integer",
+          "example": 1
+        }
+      }
+    },
+    "NewJob": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "company_id": {
+          "type": "integer"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "UpdateJob": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "company_id": {
+          "type": "integer"
+        },
+        "type": {
+          "type": "string"
+        } 
+      }
+    },
+    "JobUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        }
+      }
+    },
+    "Application": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "user_id": {
+          "type": "integer"
+        },
+        "job_id": {
+          "type": "integer"
+        },
+        "application_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "accepted", "rejected"]
+        }
+      }
+    },
+    "ApplicationCreateRequest": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "integer"
+        },
+        "job_id": {
+          "type": "integer"
+        }
+      },
+      "required": ["user_id", "job_id"]
+    },
+    "ApplicationStatusUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["pending", "accepted", "rejected"]
+        }
+      },
+      "required": ["status"]
+    },
+    "ApplicationUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type":"string"
+        }
+      }
+    },
+    "AllowedMethodsResponse": {
+      "type": "object",
+      "properties": {
+        "allowed_methods": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "example": ["GET", "POST", "OPTIONS"]
+        }
+      }
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin", "user", "guest"]
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "UserCreateRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "password": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin", "user", "guest"]
+        }
+      },
+      "required": ["username", "email", "password"]
+    },
+    "UserUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "password": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin", "user", "guest"]
+        }
+      }
+    },
+    "UserJob": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "JobApplyRequest": {
+      "type": "object",
+      "properties": {
+        "job_id": {
+          "type": "integer"
+        }
+      },
+      "required": ["job_id"]
+    }  
+  },
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Enter your Bearer token in the format: Bearer token",
+      "x-display-name": "Bearer Token",
+      "x-token-prefix": "Bearer "
+    }
+  }
+}
