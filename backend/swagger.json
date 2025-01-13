@@ -1,8 +1,8 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Authentication API",
-    "description": "API for user authentication",
+    "title": "Ben Arous Industrial Zone API",
+    "description": "API for user authentication, and REST APIs",
     "version": "1.0.0"
   },
   "paths": {
