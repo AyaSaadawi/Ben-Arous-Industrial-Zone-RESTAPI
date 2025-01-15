@@ -109,8 +109,8 @@ router.get('/google/callback', async (req, res) => {
       maxAge: 3600000, 
       sameSite: 'None', 
     });
-  
-    res.redirect('http://localhost:3000/dashboard');
+
+    res.redirect(`http://localhost:3000/dashboard?token=${token}`);
   } catch (error) {
     console.error('Error during OAuth2 callback:', error);
     res.status(500).send('Authentication failed');

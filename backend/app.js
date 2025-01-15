@@ -81,14 +81,16 @@ function authenticateJWT(req, res, next) {
 
 
   if (!token) {
-    return res.sendStatus(403); // Forbidden if no token is provided
+    return res.sendStatus(403).send('Access denied: No token provided'); // Forbidden if no token is provided
   }
 
 
   jwt.verify(token, SECRET_KEY, (err, user) => {
-    if (err) return res.sendStatus(403); // Forbidden if JWT is not valid
-    req.user = user; // Attach user info to request object
-    next(); // Proceed to the next middleware/route handler
+    if (err) {
+      return res.status(403).json({ error: 'Forbidden', details: err.message });
+    }
+    req.user = user; // Attach the user info to the request
+    next();
   });
 }
 
